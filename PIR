@@ -1,0 +1,35 @@
+
+#define PIR_PIN 2 // PIR sensor pin
+#define RELAY_PIN 9 // Relay module signal pin
+
+#include <BlynkSimpleWifi.h> // Use BlynkSimpleEsp8266.h if using ESP8266
+
+char auth[] = BLYNK_AUTH_TOKEN;
+char ssid[] = "Your_WiFi_SSID";
+char pass[] = "Your_WiFi_Password";
+
+BlynkTimer timer;
+
+void setup() {
+  Serial.begin(9600);
+  Blynk.begin(auth, ssid, pass);
+
+  pinMode(PIR_PIN, INPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW); // Turn off the relay at the beginning
+}
+
+BLYNK_WRITE(BLYNK_TEMPLATE_ID) {
+  int motionDetected = param.asInt();
+  if (motionDetected == 1) {
+    digitalWrite(RELAY_PIN, HIGH); // Turn on the relay when motion is detected
+    Blynk.notify("Motion detected!"); // Send a notification to the app
+  } else {
+    digitalWrite(RELAY_PIN, LOW); // Turn off the relay when no motion
+  }
+}
+
+void loop() {
+  Blynk.run();
+  timer.run();
+}
